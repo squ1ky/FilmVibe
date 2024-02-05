@@ -3,6 +3,8 @@ package ru.filmvibe.FilmVibe.model;
 import java.time.LocalDate;
 import java.time.Duration;
 
+import org.springframework.validation.annotation.Validated;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -11,7 +13,9 @@ import lombok.Data;
 import ru.filmvibe.FilmVibe.exception.validation.film.*;
 
 @Data
+@Validated
 public class Film {
+    private static int nextId = 1;
     private int id;
 
     @NotBlank
@@ -20,6 +24,22 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private Duration duration;
+
+    public Film(String name, String description, LocalDate releaseDate, Duration duration) {
+        this.id = nextId++;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
+
+    public Film() {
+        this.id = nextId++;
+        this.name = "No Name";
+        this.description = null;
+        this.releaseDate = null;
+        this.duration = null;
+    }
 
     public void setReleaseDate(LocalDate releaseDate) throws IncorrectReleaseDate {
         if (releaseDate.isAfter(LocalDate.of(1895, 12, 28))) {
