@@ -4,49 +4,48 @@ package ru.filmvibe.FilmVibe.controller;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.validation.Valid;
 
+import ru.filmvibe.FilmVibe.exception.FilmNotFoundException;
 import ru.filmvibe.FilmVibe.exception.validation.film.IncorrectReleaseDate;
 import ru.filmvibe.FilmVibe.exception.validation.film.NegativeFilmDuration;
 import ru.filmvibe.FilmVibe.model.Film;
+import ru.filmvibe.FilmVibe.storage.film.FilmStorage;
+import ru.filmvibe.FilmVibe.storage.film.InMemoryFilmStorage;
 
 import java.util.List;
-import java.util.ArrayList;
+
 
 @RestController
 @Slf4j
 public class FilmController {
 
-    private List<Film> films = new ArrayList<>();
+    @Autowired
+    private final FilmStorage filmStorage = new InMemoryFilmStorage();
 
     @PostMapping("/post")
     public Film addFilm(@Valid @RequestBody Film film) {
-        films.add(film);
-        log.info("POST-request /post");
-        return film;
+        log.info("POST-request CREATE /post " + film.getName());
+        return filmStorage.addFilm(film);
     }
 
     @PutMapping("/post")
-    public Film updateFilm(@Valid @RequestBody Film film) throws IncorrectReleaseDate, NegativeFilmDuration {
-        for (Film currentFilm : films) {
-            if (currentFilm.getId() == film.getId()) {
-                currentFilm.setName(film.getName());
-                currentFilm.setDescription(film.getDescription());
-                currentFilm.setReleaseDate(film.getReleaseDate());
-                currentFilm.setDuration(film.getDuration());
-                log.info("PUT-request UPDATE /post");
-                return currentFilm;
-            }
-        }
+    public Film updateFilm(@Valid @RequestBody Film film) throws IncorrectReleaseDate,
+            NegativeFilmDuration, FilmNotFoundException {
+        log.info("PUT-request CREATE /post " + film.getName());
+        return filmStorage.updateFilm(film);
+    }
 
-        films.add(film);
-        log.info("PUT-request CREATE /post");
-        return film;
+    @DeleteMapping("/post")
+    public Film deleteFilm(@Valid @RequestBody Film film) {
+        log.info("DELETE-request DELETE /post " + film.getName());
+        return filmStorage.deleteFilm(film);
     }
 
     @GetMapping("/posts")
     public List<Film> allFilms() {
         log.info("GET-request GET /posts");
-        return films;
+        return filmStorage.allFilms();
     }
 }
