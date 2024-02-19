@@ -9,6 +9,8 @@ import lombok.Data;
 
 import ru.filmvibe.FilmVibe.exception.validation.user.*;
 
+import java.util.List;
+import java.util.ArrayList;
 
 
 @Data
@@ -20,6 +22,8 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
+
+    private final List<User> friendList = new ArrayList<>();
 
     public void setName(String name) {
         if (name.isEmpty()) {
@@ -34,4 +38,5 @@ public class User {
             throw new IncorrectBirthday();
         }
     }
+
 }

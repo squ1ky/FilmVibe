@@ -25,6 +25,8 @@ public class Film {
     private LocalDate releaseDate;
     private Duration duration;
 
+    private int likes = 0;
+
     public Film(String name, String description, LocalDate releaseDate, Duration duration) {
         this.id = nextId++;
         this.name = name;
@@ -56,4 +58,5 @@ public class Film {
             throw new NegativeFilmDuration();
         }
     }
+
 }
