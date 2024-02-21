@@ -48,4 +48,5 @@ public class FilmController {
         log.info("GET-request GET /posts");
         return filmStorage.allFilms();
     }
+
 }

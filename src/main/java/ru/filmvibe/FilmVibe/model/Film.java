@@ -15,8 +15,8 @@ import ru.filmvibe.FilmVibe.exception.validation.film.*;
 @Data
 @Validated
 public class Film {
-    private static int nextId = 1;
-    private int id;
+    private static Long nextId = 1L;
+    private Long id;
 
     @NotBlank
     private String name;

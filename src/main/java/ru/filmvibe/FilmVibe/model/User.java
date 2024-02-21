@@ -9,13 +9,17 @@ import lombok.Data;
 
 import ru.filmvibe.FilmVibe.exception.validation.user.*;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Objects;
 
 
 @Data
 public class User {
-    private int id;
+
+    private static Long nextId = 1L;
+    private Long id;
+
     @Email
     private String email;
     @NotBlank
@@ -23,7 +27,15 @@ public class User {
     private String name;
     private LocalDate birthday;
 
-    private final List<User> friendList = new ArrayList<>();
+    private final Set<Long> friends = new HashSet<>();
+
+    public User(String email, String login, String name, LocalDate birthday) {
+        this.id = nextId++;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+    }
 
     public void setName(String name) {
         if (name.isEmpty()) {
@@ -37,6 +49,23 @@ public class User {
         } else {
             throw new IncorrectBirthday();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+        return Objects.equals(id, user.getId()) &&
+                Objects.equals(email, user.getEmail()) &&
+                Objects.equals(login, user.getLogin()) &&
+                Objects.equals(name, user.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, login, name);
     }
 
 }

@@ -2,9 +2,11 @@ package ru.filmvibe.FilmVibe.service;
 
 import ru.filmvibe.FilmVibe.model.Film;
 import ru.filmvibe.FilmVibe.model.comparator.FilmComparator;
+import ru.filmvibe.FilmVibe.storage.film.FilmStorage;
 import ru.filmvibe.FilmVibe.storage.film.InMemoryFilmStorage;
 
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -12,7 +14,8 @@ import java.util.List;
 @Service
 public class FilmService {
 
-    InMemoryFilmStorage inMemoryFilmStorage;
+    @Autowired
+    private final FilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
     final Film[] top10ByLikes = new Film[10];
 
     public void addLike(Film film) {

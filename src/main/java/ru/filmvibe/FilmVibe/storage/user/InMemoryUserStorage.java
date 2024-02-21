@@ -35,14 +35,18 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User deleteUser(User user) {
-        users.remove(user);
-        return user;
-    }
-
-
-    @Override
     public List<User> allUsers() {
         return users;
+    }
+
+    @Override
+    public User getById(Long id) throws UserNotFoundException {
+        for (User user : users) {
+            if (user.getId().equals(id)) {
+                return user;
+            }
+        }
+
+        throw new UserNotFoundException(id.toString());
     }
 }

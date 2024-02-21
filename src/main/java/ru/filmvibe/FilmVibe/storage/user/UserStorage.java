@@ -10,6 +10,6 @@ import java.util.List;
 public interface UserStorage {
     User createUser(User user);
     User updateUser(User user) throws IncorrectBirthday, UserNotFoundException;
-    User deleteUser(User user);
     List<User> allUsers();
+    User getById(Long id) throws UserNotFoundException;
 }
