@@ -12,6 +12,9 @@ import lombok.Data;
 
 import ru.filmvibe.FilmVibe.exception.validation.film.*;
 
+import java.util.List;
+import java.util.ArrayList;
+
 @Data
 @Validated
 public class Film {
@@ -26,6 +29,7 @@ public class Film {
     private Duration duration;
 
     private int likes = 0;
+    private List<Long> likedById = new ArrayList<>();
 
     public Film(String name, String description, LocalDate releaseDate, Duration duration) {
         this.id = nextId++;
@@ -58,5 +62,4 @@ public class Film {
             throw new NegativeFilmDuration();
         }
     }
-
 }

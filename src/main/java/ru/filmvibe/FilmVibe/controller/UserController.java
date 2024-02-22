@@ -67,7 +67,7 @@ public class UserController {
     public List<Long> findFriends(@PathVariable Long id) throws UserNotFoundException {
         return new ArrayList<>(userStorage.getById(id).getFriends());
     }
-    
+
     @GetMapping("/users/{id}/friends/common/{otherId}")
     public List<Long> findGeneralFriends(@PathVariable Long id, @PathVariable Long otherId)
             throws UserNotFoundException {

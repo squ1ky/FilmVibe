@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface FilmStorage {
     Film addFilm(Film film);
-    Film updateFilm(Film id) throws NegativeFilmDuration, IncorrectReleaseDate, FilmNotFoundException;
-    Film deleteFilm(Film id);
+    Film updateFilm(Film film) throws NegativeFilmDuration, IncorrectReleaseDate, FilmNotFoundException;
     List<Film> allFilms();
+    Film getById(Long id) throws FilmNotFoundException;
 }

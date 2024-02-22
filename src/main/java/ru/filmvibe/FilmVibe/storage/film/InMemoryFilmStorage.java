@@ -37,14 +37,18 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film deleteFilm(Film film) {
-        films.remove(film);
-        return film;
-    }
-
-
-    @Override
     public List<Film> allFilms() {
         return films;
+    }
+
+    @Override
+    public Film getById(Long id) throws FilmNotFoundException {
+        for (Film film : films) {
+            if (film.getId().equals(id)) {
+                return film;
+            }
+        }
+
+        throw new FilmNotFoundException(id.toString());
     }
 }
