@@ -2,7 +2,8 @@ package ru.filmvibe.FilmVibe.storage.user;
 
 import org.springframework.stereotype.Component;
 
-import ru.filmvibe.FilmVibe.exception.UserNotFoundException;
+import ru.filmvibe.FilmVibe.exception.validation.user.UserNotFoundException;
+import ru.filmvibe.FilmVibe.exception.validation.user.UserAlreadyExistsException;
 import ru.filmvibe.FilmVibe.exception.validation.user.IncorrectBirthday;
 import ru.filmvibe.FilmVibe.model.User;
 
@@ -16,7 +17,11 @@ public class InMemoryUserStorage implements UserStorage {
     private final List<User> users = new ArrayList<>();
 
     @Override
-    public User createUser(User user) {
+    public User createUser(User user) throws UserAlreadyExistsException {
+        if (users.contains(user)) {
+            throw new UserAlreadyExistsException(user.getLogin());
+        }
+
         users.add(user);
         return user;
     }

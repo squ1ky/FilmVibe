@@ -1,4 +1,4 @@
-package ru.filmvibe.FilmVibe.exception;
+package ru.filmvibe.FilmVibe.exception.validation.user;
 
 public class UserNotFoundException extends Exception {
 

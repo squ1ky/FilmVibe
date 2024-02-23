@@ -2,7 +2,8 @@ package ru.filmvibe.FilmVibe.storage.film;
 
 import org.springframework.stereotype.Component;
 
-import ru.filmvibe.FilmVibe.exception.FilmNotFoundException;
+import ru.filmvibe.FilmVibe.exception.validation.film.FilmAlreadyExistsException;
+import ru.filmvibe.FilmVibe.exception.validation.film.FilmNotFoundException;
 import ru.filmvibe.FilmVibe.exception.validation.film.IncorrectReleaseDate;
 import ru.filmvibe.FilmVibe.exception.validation.film.NegativeFilmDuration;
 import ru.filmvibe.FilmVibe.model.Film;
@@ -17,7 +18,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     final List<Film> films = new ArrayList<>();
 
     @Override
-    public Film addFilm(Film film) {
+    public Film addFilm(Film film) throws FilmAlreadyExistsException {
+        if (films.contains(film)) {
+            throw new FilmAlreadyExistsException(film.getName());
+        }
+
         films.add(film);
         return film;
     }

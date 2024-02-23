@@ -3,7 +3,7 @@ package ru.filmvibe.FilmVibe.service;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import ru.filmvibe.FilmVibe.exception.UserNotFoundException;
+import ru.filmvibe.FilmVibe.exception.validation.user.UserNotFoundException;
 import ru.filmvibe.FilmVibe.model.User;
 import ru.filmvibe.FilmVibe.storage.user.UserStorage;
 import ru.filmvibe.FilmVibe.storage.user.InMemoryUserStorage;

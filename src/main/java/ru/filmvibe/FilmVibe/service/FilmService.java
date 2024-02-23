@@ -1,7 +1,7 @@
 package ru.filmvibe.FilmVibe.service;
 
 import ru.filmvibe.FilmVibe.exception.CountIsBiggerThanFilmsSizeException;
-import ru.filmvibe.FilmVibe.exception.FilmNotFoundException;
+import ru.filmvibe.FilmVibe.exception.validation.film.FilmNotFoundException;
 import ru.filmvibe.FilmVibe.exception.UserNotLikedThisFilmException;
 import ru.filmvibe.FilmVibe.model.Film;
 import ru.filmvibe.FilmVibe.model.comparator.FilmComparator;
@@ -27,7 +27,7 @@ public class FilmService {
     public void addLike(Long filmId, Long userId) throws FilmNotFoundException, UserAlreadyLikedThisFilmException {
         Film film = filmStorage.getById(filmId);
         if (film.getLikedById().contains(userId)) {
-            throw new UserAlreadyLikedThisFilmException("Вы уже лайкнули этот фильм.");
+            throw new UserAlreadyLikedThisFilmException("Пользователь уже лайкнул этот фильм.");
         } else {
             int likes = film.getLikes() + 1;
             film.setLikes(likes);
@@ -38,7 +38,7 @@ public class FilmService {
     public void deleteLike(Long filmId, Long userId) throws FilmNotFoundException, UserNotLikedThisFilmException {
         Film film = filmStorage.getById(filmId);
         if (!film.getLikedById().contains(userId)) {
-            throw new UserNotLikedThisFilmException("Вы уже лайкнули этот фильм.");
+            throw new UserNotLikedThisFilmException("Пользователь не лайкнул этот фильм.");
         } else {
             int likes = film.getLikes() - 1;
             film.setLikes(likes);

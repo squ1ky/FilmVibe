@@ -14,6 +14,7 @@ import ru.filmvibe.FilmVibe.exception.validation.film.*;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Objects;
 
 @Data
 @Validated
@@ -61,5 +62,23 @@ public class Film {
         } else {
             throw new NegativeFilmDuration();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Film film = (Film) o;
+        return Objects.equals(name, film.getName()) &&
+                Objects.equals(description, film.getDescription()) &&
+                Objects.equals(releaseDate, film.getReleaseDate()) &&
+                Objects.equals(duration, film.getDuration()) &&
+                Objects.equals(likes, film.getLikes());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, releaseDate, duration);
     }
 }

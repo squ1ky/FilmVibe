@@ -1,4 +1,4 @@
-package ru.filmvibe.FilmVibe.exception;
+package ru.filmvibe.FilmVibe.exception.validation.film;
 
 public class FilmNotFoundException extends Exception {
 

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.validation.Valid;
 
 import ru.filmvibe.FilmVibe.exception.*;
+import ru.filmvibe.FilmVibe.exception.validation.film.FilmAlreadyExistsException;
+import ru.filmvibe.FilmVibe.exception.validation.film.FilmNotFoundException;
 import ru.filmvibe.FilmVibe.exception.validation.film.IncorrectReleaseDate;
 import ru.filmvibe.FilmVibe.exception.validation.film.NegativeFilmDuration;
 import ru.filmvibe.FilmVibe.model.Film;
@@ -28,7 +30,7 @@ public class FilmController {
     private FilmService filmService;
 
     @PostMapping("/film")
-    public Film addFilm(@Valid @RequestBody Film film) {
+    public Film addFilm(@Valid @RequestBody Film film) throws FilmAlreadyExistsException {
         log.info("POST-request CREATE /post " + film.getName());
         return filmStorage.addFilm(film);
     }
@@ -65,4 +67,5 @@ public class FilmController {
             throws CountIsBiggerThanFilmsSizeException, IncorrectParameterException {
         return filmService.getTopByLikes(count);
     }
+
 }

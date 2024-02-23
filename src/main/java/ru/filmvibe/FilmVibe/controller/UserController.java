@@ -7,8 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import jakarta.validation.Valid;
 
-import ru.filmvibe.FilmVibe.exception.UserNotFoundException;
+import ru.filmvibe.FilmVibe.exception.validation.user.UserNotFoundException;
 import ru.filmvibe.FilmVibe.exception.validation.user.IncorrectBirthday;
+import ru.filmvibe.FilmVibe.exception.validation.user.UserAlreadyExistsException;
 import ru.filmvibe.FilmVibe.model.User;
 import ru.filmvibe.FilmVibe.storage.user.UserStorage;
 import ru.filmvibe.FilmVibe.service.UserService;
@@ -28,7 +29,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/user")
-    public User createUser(@Valid @RequestBody User user) {
+    public User createUser(@Valid @RequestBody User user) throws UserAlreadyExistsException {
         log.info("POST-request CREATE /user " + user.getLogin());
         return userStorage.createUser(user);
     }
