@@ -20,11 +20,19 @@ public class UserService {
 
     final List<Long> generalFriends = new ArrayList<>();
 
-    public void addFriend(Long user1Id, Long user2Id) throws UserNotFoundException {
-        User user1 = userStorage.getById(user1Id);
-        User user2 = userStorage.getById(user2Id);
-        user1.getFriends().add(user2Id);
-        user2.getFriends().add(user1Id);
+    public void addFriend(Long id, Long friendId) throws UserNotFoundException {
+        User user = userStorage.getById(id);
+        User friend = userStorage.getById(friendId);
+
+        if (user.getIncomingFriendRequests().contains(friendId)) {
+            user.getFriends().add(friendId);
+            friend.getFriends().add(id);
+
+            user.getIncomingFriendRequests().remove(friendId);
+            friend.getIncomingFriendRequests().remove(id);
+        } else {
+            friend.getIncomingFriendRequests().add(id);
+        }
     }
 
     public void deleteFriend(Long user1Id, Long user2Id) throws UserNotFoundException {

@@ -6,10 +6,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import ru.filmvibe.FilmVibe.exception.CountIsBiggerThanFilmsSizeException;
-import ru.filmvibe.FilmVibe.exception.IncorrectParameterException;
-import ru.filmvibe.FilmVibe.exception.UserAlreadyLikedThisFilmException;
-import ru.filmvibe.FilmVibe.exception.UserNotLikedThisFilmException;
+import ru.filmvibe.FilmVibe.exception.*;
 import ru.filmvibe.FilmVibe.exception.validation.film.*;
 import ru.filmvibe.FilmVibe.exception.validation.user.*;
 
@@ -83,4 +80,15 @@ public class ErrorHandler {
         return e.getMessage();
     }
 
+    @ExceptionHandler(IncorrectGenreException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleIncorrectGenreException(final IncorrectGenreException e) {
+        return "Неправильное название жанра: " + e.getMessage();
+    }
+
+    @ExceptionHandler(IncorrectMPAException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleIncorrectMPAException(final IncorrectMPAException e) {
+        return "Неправильный формат MPA (Motion Picture Association): " + e.getMessage();
+    }
 }

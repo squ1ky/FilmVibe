@@ -10,6 +10,8 @@ import jakarta.validation.constraints.Size;
 
 import lombok.Data;
 
+import ru.filmvibe.FilmVibe.exception.IncorrectGenreException;
+import ru.filmvibe.FilmVibe.exception.IncorrectMPAException;
 import ru.filmvibe.FilmVibe.exception.validation.film.*;
 
 import java.util.List;
@@ -29,15 +31,22 @@ public class Film {
     private LocalDate releaseDate;
     private Duration duration;
 
+    private String genre;
+    private String MPA;
+
     private int likes = 0;
     private List<Long> likedById = new ArrayList<>();
 
-    public Film(String name, String description, LocalDate releaseDate, Duration duration) {
+    public Film(String name, String description, LocalDate releaseDate, Duration duration,
+                String genre, String MPA)
+        throws IncorrectReleaseDate, NegativeFilmDuration, IncorrectGenreException, IncorrectMPAException {
         this.id = nextId++;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
+        setName(name);
+        setDescription(description);
+        setReleaseDate(releaseDate);
+        setDuration(duration);
+        setGenre(genre);
+        setMPA(MPA);
     }
 
     public Film() {
@@ -46,6 +55,8 @@ public class Film {
         this.description = null;
         this.releaseDate = null;
         this.duration = null;
+        this.genre = null;
+        this.MPA = "U";
     }
 
     public void setReleaseDate(LocalDate releaseDate) throws IncorrectReleaseDate {
@@ -62,6 +73,27 @@ public class Film {
         } else {
             throw new NegativeFilmDuration();
         }
+    }
+
+    public void setGenre(String genre) throws IncorrectGenreException {
+        if (genre.equals("Комедия") || genre.equals("Драма") ||
+            genre.equals("Мультфильм") || genre.equals("Триллер") ||
+            genre.equals("Документальный") || genre.equals("Боеввик")) {
+
+            this.genre = genre;
+        } else {
+            throw new IncorrectGenreException(genre);
+        }
+    }
+
+    public void setMPA(String MPA) throws IncorrectMPAException {
+        if (MPA.equals("G") || MPA.equals("PG") ||
+            MPA.equals("PG-13") || MPA.equals("R") ||
+            MPA.equals("NC-17")) {
+            this.MPA = MPA;
+        }
+
+        throw new IncorrectMPAException(MPA);
     }
 
     @Override

@@ -55,7 +55,7 @@ public class UserController {
     @PutMapping("/users/{id}/friends/{friendId}")
     public String addFriend(@PathVariable Long id, @PathVariable Long friendId) throws UserNotFoundException {
         userService.addFriend(id, friendId);
-        return "Друг добавлен!";
+        return "Запрос в друзья был отправлен!";
     }
 
     @DeleteMapping("/users/{id}/friends/{friendId}")
