@@ -20,6 +20,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film addFilm(Film film) throws FilmAlreadyExistsException {
         if (films.contains(film)) {
+            Film.setNextId(Film.getNextId() - 1);
             throw new FilmAlreadyExistsException(film.getName());
         }
 

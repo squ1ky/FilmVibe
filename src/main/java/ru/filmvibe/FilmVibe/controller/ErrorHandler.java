@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import ru.filmvibe.FilmVibe.exception.*;
+import ru.filmvibe.FilmVibe.exception.film.CountIsBiggerThanFilmsSizeException;
+import ru.filmvibe.FilmVibe.exception.film.IncorrectGenreException;
+import ru.filmvibe.FilmVibe.exception.film.IncorrectMPAException;
+import ru.filmvibe.FilmVibe.exception.user.UserAlreadyLikedThisFilmException;
+import ru.filmvibe.FilmVibe.exception.user.UserNotLikedThisFilmException;
 import ru.filmvibe.FilmVibe.exception.validation.film.*;
 import ru.filmvibe.FilmVibe.exception.validation.user.*;
 

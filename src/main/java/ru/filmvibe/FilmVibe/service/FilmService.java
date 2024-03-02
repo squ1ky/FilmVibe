@@ -1,13 +1,13 @@
 package ru.filmvibe.FilmVibe.service;
 
-import ru.filmvibe.FilmVibe.exception.CountIsBiggerThanFilmsSizeException;
+import ru.filmvibe.FilmVibe.exception.film.CountIsBiggerThanFilmsSizeException;
 import ru.filmvibe.FilmVibe.exception.validation.film.FilmNotFoundException;
-import ru.filmvibe.FilmVibe.exception.UserNotLikedThisFilmException;
+import ru.filmvibe.FilmVibe.exception.user.UserNotLikedThisFilmException;
 import ru.filmvibe.FilmVibe.model.Film;
 import ru.filmvibe.FilmVibe.model.comparator.FilmComparator;
 import ru.filmvibe.FilmVibe.storage.film.FilmStorage;
 import ru.filmvibe.FilmVibe.storage.film.InMemoryFilmStorage;
-import ru.filmvibe.FilmVibe.exception.UserAlreadyLikedThisFilmException;
+import ru.filmvibe.FilmVibe.exception.user.UserAlreadyLikedThisFilmException;
 import ru.filmvibe.FilmVibe.exception.IncorrectParameterException;
 
 import org.springframework.stereotype.Service;

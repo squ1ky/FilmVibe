@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import ru.filmvibe.FilmVibe.exception.validation.user.*;
 
@@ -17,6 +19,8 @@ import java.util.Objects;
 @Data
 public class User {
 
+    @Setter
+    @Getter
     private static Long nextId = 1L;
     private Long id;
 

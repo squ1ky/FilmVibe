@@ -1,4 +1,4 @@
-package ru.filmvibe.FilmVibe.exception;
+package ru.filmvibe.FilmVibe.exception.film;
 
 public class IncorrectGenreException extends Exception {
 

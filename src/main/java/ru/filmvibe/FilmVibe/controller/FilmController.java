@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.validation.Valid;
 
 import ru.filmvibe.FilmVibe.exception.*;
+import ru.filmvibe.FilmVibe.exception.film.CountIsBiggerThanFilmsSizeException;
+import ru.filmvibe.FilmVibe.exception.user.UserAlreadyLikedThisFilmException;
+import ru.filmvibe.FilmVibe.exception.user.UserNotLikedThisFilmException;
 import ru.filmvibe.FilmVibe.exception.validation.film.FilmAlreadyExistsException;
 import ru.filmvibe.FilmVibe.exception.validation.film.FilmNotFoundException;
 import ru.filmvibe.FilmVibe.exception.validation.film.IncorrectReleaseDate;

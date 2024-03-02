@@ -9,9 +9,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import ru.filmvibe.FilmVibe.exception.IncorrectGenreException;
-import ru.filmvibe.FilmVibe.exception.IncorrectMPAException;
+import ru.filmvibe.FilmVibe.exception.film.IncorrectGenreException;
+import ru.filmvibe.FilmVibe.exception.film.IncorrectMPAException;
 import ru.filmvibe.FilmVibe.exception.validation.film.*;
 
 import java.util.List;
@@ -21,6 +23,9 @@ import java.util.Objects;
 @Data
 @Validated
 public class Film {
+
+    @Setter
+    @Getter
     private static Long nextId = 1L;
     private Long id;
 
