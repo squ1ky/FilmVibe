@@ -72,9 +72,9 @@ public class FilmController {
         return "Лайк убран с фильма.";
     }
 
-    @GetMapping("/films/popular")
-    public List<Film> getTopByLikes(@RequestParam(required = false) Long count) {
-        return filmService.getTopByLikes(count);
-    }
+//    @GetMapping("/films/popular")
+//    public List<Film> getTopByLikes(@RequestParam(required = false) Long count) {
+//        return filmService.getTopByLikes(count);
+//    }
 
 }

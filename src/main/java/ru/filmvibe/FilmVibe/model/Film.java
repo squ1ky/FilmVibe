@@ -26,6 +26,8 @@ public class Film {
     @Setter
     private Long id = nextId;
 
+    @Getter
+    @Setter
     private static Long nextId = 1L;
 
     @NotBlank

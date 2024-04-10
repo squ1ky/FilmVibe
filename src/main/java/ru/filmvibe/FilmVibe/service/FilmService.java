@@ -1,5 +1,6 @@
 package ru.filmvibe.FilmVibe.service;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.filmvibe.FilmVibe.model.Film;
 import ru.filmvibe.FilmVibe.model.comparator.FilmComparator;
 import ru.filmvibe.FilmVibe.storage.film.FilmStorage;
@@ -17,60 +18,97 @@ public class FilmService {
 
     @Autowired
     private final FilmStorage filmStorage;
-    final List<Film> topByLikes = new ArrayList<>();
+
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmService(FilmDbStorage filmDbStorage) {
+    public FilmService(FilmDbStorage filmDbStorage, JdbcTemplate jdbcTemplate) {
         filmStorage = filmDbStorage;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public void addLike(Long filmId, Long userId) {
-        Film film = filmStorage.getById(filmId);
-        if (film.getLikedById().contains(userId)) {
-//            throw new UserAlreadyLikedThisFilmException("Пользователь уже лайкнул этот фильм.");
+        if (getUsersIdLikedFilm(filmId).contains(userId)) {
+            //throw new UserAlreadyLikedThisFilmException("Пользователь уже лайкнул этот фильм.");
         } else {
-            long likes = film.getLikes() + 1;
-            film.setLikes(likes);
-            film.getLikedById().add(userId);
+            String sqlForFilmLikes =
+                    """
+                    UPDATE Film_Likes
+                    SET likes_quantity = likes_quantity + 1
+                    WHERE id = ?
+                    """;
+
+            String sqlForFilmLikedBy =
+                    """
+                    INSERT INTO Film_Liked_By (film_id, user_id)
+                    VALUES (?, ?)
+                    """;
+
+            jdbcTemplate.update(sqlForFilmLikes, filmId);
+            jdbcTemplate.update(sqlForFilmLikedBy, filmId, userId);
         }
     }
 
     public void deleteLike(Long filmId, Long userId) {
-        Film film = filmStorage.getById(filmId);
-        if (!film.getLikedById().contains(userId)) {
-//            throw new UserNotLikedThisFilmException("Пользователь не лайкнул этот фильм.");
+        if (getUsersIdLikedFilm(filmId).contains(userId)) {
+            String sqlForFilmLikes =
+                    """
+                    UPDATE Film_Likes
+                    SET likes_quantity = likes_quantity - 1
+                    WHERE id = ?
+                    """;
+
+            String sqlForFilmLikedBy =
+                    """
+                    DELETE FROM Film_Liked_By
+                    WHERE (film_id = ? AND user_id = ?)
+                    """;
+
+            jdbcTemplate.update(sqlForFilmLikes, filmId);
+            jdbcTemplate.update(sqlForFilmLikedBy, filmId, userId);
         } else {
-            long likes = film.getLikes() - 1;
-            film.setLikes(likes);
-            film.getLikedById().remove(userId);
+            // throw exception ...
         }
     }
 
-    public List<Film> getTopByLikes(Long count) {
-        topByLikes.clear();
-        List<Film> allFilms = filmStorage.allFilms();
+    private List<Long> getUsersIdLikedFilm(Long id) {
+        String sql =
+                """
+                SELECT user_id
+                FROM Film_Liked_By
+                WHERE film_id = ?
+                """;
 
-        if (count == null) {
-            if (allFilms.size() > 10) {
-                count = 10L;
-            } else {
-                count = (long) allFilms.size();
-            }
-        }
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("user_id"), id);
+    }
 
-        if (count < 0) {
+    // MAKE THIS SOON
+
+//    public List<Film> getTopByLikes(Long count) {
+//        topByLikes.clear();
+//        List<Film> allFilms = filmStorage.allFilms();
+//
+//        if (count == null) {
+//            if (allFilms.size() > 10) {
+//                count = 10L;
+//            } else {
+//                count = (long) allFilms.size();
+//            }
+//        }
+//
+//        if (count < 0) {
 //            throw new IncorrectParameterException(count.toString());
-        }
-
-        if (count > allFilms.size()) {
+//        }
+//
+//        if (count > allFilms.size()) {
 //            throw new CountIsBiggerThanFilmsSizeException("count > allFilms.size()");
-        }
-
-        allFilms.sort(new FilmComparator());
-        for (int i = 0; i < count; i++) {
-            topByLikes.add(allFilms.get(i));
-        }
-
-        return topByLikes;
-    }
+//        }
+//
+//        allFilms.sort(new FilmComparator());
+//        for (int i = 0; i < count; i++) {
+//            topByLikes.add(allFilms.get(i));
+//        }
+//
+//        return topByLikes;
+// }
 }

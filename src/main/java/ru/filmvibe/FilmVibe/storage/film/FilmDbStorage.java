@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import ru.filmvibe.FilmVibe.exceptions.film.FilmAlreadyExistsException;
+import ru.filmvibe.FilmVibe.exceptions.film.FilmNotFoundException;
 import ru.filmvibe.FilmVibe.model.Film;
 
 import java.sql.ResultSet;
@@ -28,7 +30,11 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film addFilm(Film film) {
+    public Film addFilm(Film film) throws FilmAlreadyExistsException {
+
+        if (ContainsFilm(film)) {
+            throw new FilmAlreadyExistsException(film.getName());
+        }
 
         String sqlForFilms =
                 """
@@ -40,6 +46,12 @@ public class FilmDbStorage implements FilmStorage {
                 """
                 INSERT INTO Films_Info (genre, mpa, release_date, duration)
                 VALUES (?, ?, ?, ?)
+                """;
+
+        String sqlForFilmLikes =
+                """
+                INSERT INTO Film_Likes (id, likes_quantity)
+                VALUES (?, ?)
                 """;
 
         jdbcTemplate.update(sqlForFilms,
@@ -54,6 +66,10 @@ public class FilmDbStorage implements FilmStorage {
                 film.getReleaseDate(),
                 ConvertDurationToSqlTime(film.getDuration())
         );
+
+        jdbcTemplate.update(sqlForFilmLikes, film.getId(), 0);
+
+        Film.setNextId(film.getId() + 1);
 
         return film;
     }
@@ -130,5 +146,39 @@ public class FilmDbStorage implements FilmStorage {
     private java.sql.Time ConvertDurationToSqlTime(Duration duration) {
         LocalTime durationLT = LocalTime.MIDNIGHT.plus(duration);
         return java.sql.Time.valueOf(durationLT);
+    }
+
+    private boolean ContainsFilmId(Long id) {
+        String sql =
+                """
+                SELECT COUNT(*)
+                FROM Films
+                WHERE id = ?
+                """;
+
+        Long cnt = jdbcTemplate.queryForObject(sql, Long.class, id);
+
+        if (cnt == null || cnt == 0L) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean ContainsFilm(Film film) {
+        String sql =
+                """
+                SELECT COUNT(*)
+                FROM Films
+                WHERE (name = ? AND description = ?)
+                """;
+
+        Long cnt = jdbcTemplate.queryForObject(sql, Long.class, film.getName(), film.getDescription());
+
+        if (cnt == null || cnt == 0L) {
+            return false;
+        }
+
+        return true;
     }
 }
