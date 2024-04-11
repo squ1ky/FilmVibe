@@ -11,4 +11,5 @@ public interface FilmStorage {
     Film updateFilm(Film film);
     List<Film> allFilms();
     Film getById(Long id) throws FilmNotFoundException;
+    String deleteById(Long id);
 }

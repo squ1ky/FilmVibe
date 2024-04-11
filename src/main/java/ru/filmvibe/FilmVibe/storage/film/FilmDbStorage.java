@@ -50,8 +50,8 @@ public class FilmDbStorage implements FilmStorage {
 
         String sqlForFilmLikes =
                 """
-                INSERT INTO Film_Likes (id, likes_quantity)
-                VALUES (?, ?)
+                INSERT INTO Film_Likes (likes_quantity)
+                VALUES (?)
                 """;
 
         jdbcTemplate.update(sqlForFilms,
@@ -67,7 +67,7 @@ public class FilmDbStorage implements FilmStorage {
                 ConvertDurationToSqlTime(film.getDuration())
         );
 
-        jdbcTemplate.update(sqlForFilmLikes, film.getId(), 0);
+        jdbcTemplate.update(sqlForFilmLikes, 0);
 
         Film.setNextId(film.getId() + 1);
 
@@ -130,8 +130,44 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> makeFilm(rs), id);
     }
 
+    @Override
+    public String deleteById(Long id) {
+        if (ContainsFilmId(id)) {
+
+            String sqlForFilmsInfo =
+                    """
+                    DELETE FROM Films_Info
+                    WHERE id = ?
+                    """;
+            String sqlForFilmLikedBy =
+                    """
+                    DELETE FROM Film_Liked_By
+                    WHERE film_id = ?
+                    """;
+            String sqlForFilmLikes =
+                    """
+                    DELETE FROM Film_Likes
+                    WHERE id = ?
+                    """;
+            String sqlForFilms =
+                    """
+                    DELETE FROM Films
+                    WHERE id = ?
+                    """;
+
+            jdbcTemplate.update(sqlForFilmsInfo, id);
+            jdbcTemplate.update(sqlForFilmLikedBy, id);
+            jdbcTemplate.update(sqlForFilmLikes, id);
+            jdbcTemplate.update(sqlForFilms, id);
+
+            return "Фильм удален!";
+        }
+
+        return "Фильм не удален";
+    }
+
     private Film makeFilm(ResultSet rs) throws SQLException {
-        Long id = rs.getLong("Films.id");
+        Long id = rs.getLong("id");
         String name = rs.getString("name");
         String description = rs.getString("description");
         String genre = rs.getString("genre");

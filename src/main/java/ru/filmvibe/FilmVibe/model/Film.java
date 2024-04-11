@@ -31,10 +31,10 @@ public class Film {
     private static Long nextId = 1L;
 
     @NotBlank
-    @Size(max = 64)
+    @Size(max = 100)
     private String name;
 
-    @Size(max = 200)
+    @Size(max = 1024)
     private String description;
     private LocalDate releaseDate;
     private Duration duration;

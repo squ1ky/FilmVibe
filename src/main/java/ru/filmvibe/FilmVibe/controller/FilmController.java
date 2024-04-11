@@ -56,8 +56,13 @@ public class FilmController {
     }
 
     @GetMapping("/film/{id}")
-    public Film getFilmById(Long id) {
+    public Film getFilmById(@PathVariable Long id) {
         return filmStorage.getById(id);
+    }
+
+    @DeleteMapping("/film/{id}")
+    public String deleteFilm(@PathVariable Long id) {
+        return filmStorage.deleteById(id);
     }
 
     @PutMapping("/films/{id}/like/{userId}")
