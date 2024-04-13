@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS Film_Likes(
 );
 
 CREATE TABLE IF NOT EXISTS Film_Liked_By(
-    film_id BIGINT,
+    film_id BIGINT PRIMARY KEY,
     user_id BIGINT,
 
     FOREIGN KEY (film_id) REFERENCES Films (id),

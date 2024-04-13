@@ -44,8 +44,8 @@ public class FilmService {
                     VALUES (?, ?)
                     """;
 
-            jdbcTemplate.update(sqlForFilmLikes, filmId);
             jdbcTemplate.update(sqlForFilmLikedBy, filmId, userId);
+            jdbcTemplate.update(sqlForFilmLikes, filmId);
         }
     }
 
@@ -64,8 +64,8 @@ public class FilmService {
                     WHERE (film_id = ? AND user_id = ?)
                     """;
 
-            jdbcTemplate.update(sqlForFilmLikes, filmId);
             jdbcTemplate.update(sqlForFilmLikedBy, filmId, userId);
+            jdbcTemplate.update(sqlForFilmLikes, filmId);
         } else {
             // throw exception ...
         }
@@ -82,7 +82,28 @@ public class FilmService {
         return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("user_id"), id);
     }
 
-    // MAKE THIS SOON
+    public List<Film> getTopByLikes(Long count) {
+        String sql =
+                """
+                SELECT
+                Films.id as id,
+                name,
+                description,
+                genre,
+                mpa,
+                release_date,
+                duration,
+                likes_quantity,
+                FROM Film_Likes
+                JOIN Films ON Film_Likes.id = Films.id
+                JOIN Films_Info ON Film_Likes.id = Films_Info.id
+                ORDER BY likes_quantity DESC
+                LIMIT(?)
+                """;
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> filmStorage.makeFilm(rs) , count);
+    }
+
 
 //    public List<Film> getTopByLikes(Long count) {
 //        topByLikes.clear();

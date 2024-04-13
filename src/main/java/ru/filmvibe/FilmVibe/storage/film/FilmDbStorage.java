@@ -69,14 +69,13 @@ public class FilmDbStorage implements FilmStorage {
 
         jdbcTemplate.update(sqlForFilmLikes, 0);
 
-        Film.setNextId(film.getId() + 1);
-
         return film;
     }
 
     @Override
-    public Film updateFilm(Film film) {
-        // INSERT ID INTO JSON
+    public Film updateFilm(Film film, Long id) {
+        film.setId(id);
+
         String sqlForFilms =
                 """
                 UPDATE Films
@@ -94,7 +93,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlForFilms,
                 film.getName(),
                 film.getDescription(),
-                film.getId()
+                id
         );
 
         jdbcTemplate.update(sqlForFilmsInfo,
@@ -102,7 +101,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpa(),
                 film.getReleaseDate(),
                 ConvertDurationToSqlTime(film.getDuration()),
-                film.getId()
+                id
         );
 
         return film;
@@ -112,8 +111,10 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> allFilms() {
         String sql =
                 """
-                SELECT Films.id, name, description, genre, mpa, release_date, duration
-                FROM Films JOIN Films_Info ON Films.id = Films_Info.id
+                SELECT Films.id, name, description, genre, mpa, release_date, duration, likes_quantity
+                FROM Films
+                JOIN Films_Info ON Films.id = Films_Info.id
+                JOIN Film_Likes ON Films.id = Film_Likes.id
                 """;
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs));
@@ -122,8 +123,10 @@ public class FilmDbStorage implements FilmStorage {
     public Film getById(Long id) {
         String sql =
                 """
-                SELECT Films.id, name, description, genre, mpa, release_date, duration
-                FROM Films JOIN Films_Info ON Films.id = Films_Info.id
+                SELECT Films.id, name, description, genre, mpa, release_date, duration, likes_quantity
+                FROM Films
+                JOIN Films_Info ON Films.id = Films_Info.id
+                JOIN Film_Likes ON Films.id = Film_Likes.id
                 WHERE Films.id = ?
                 """;
 
@@ -166,17 +169,18 @@ public class FilmDbStorage implements FilmStorage {
         return "Фильм не удален";
     }
 
-    private Film makeFilm(ResultSet rs) throws SQLException {
+    @Override
+    public Film makeFilm(ResultSet rs) throws SQLException {
         Long id = rs.getLong("id");
         String name = rs.getString("name");
         String description = rs.getString("description");
         String genre = rs.getString("genre");
         String mpa = rs.getString("mpa");
         LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
-
         Duration duration = Duration.between(LocalTime.MIDNIGHT, rs.getTime("duration").toLocalTime());
+        Long likes = rs.getLong("likes_quantity");
 
-        return new Film(id, name, description, releaseDate, duration, genre, mpa);
+        return new Film(id, name, description, releaseDate, duration, genre, mpa, likes);
     }
 
     private java.sql.Time ConvertDurationToSqlTime(Duration duration) {

@@ -129,6 +129,18 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sql, userId, friendId, userId, friendId);
     }
 
+    @Override
+    public List<Long> getFriends(Long id) {
+        String sql =
+                """
+                SELECT friend_id
+                FROM Friends
+                WHERE (user_id = ? AND is_accepted = true)
+                """;
+
+        return jdbcTemplate.queryForList(sql, Long.class, id);
+    }
+
     private Long isFriendRequestExists(Long userId, Long friendId) {
         String sql =
                 """

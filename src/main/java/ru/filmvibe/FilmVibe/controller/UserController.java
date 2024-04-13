@@ -71,14 +71,14 @@ public class UserController {
         return "Друг удалён!";
     }
 
-//    @GetMapping("/users/{id}/friends")
-//    public List<Long> findFriends(@PathVariable Long id)  {
-//        return new ArrayList<>(userStorage.getById(id).getFriends());
-//    }
+    @GetMapping("/users/{id}/friends")
+    public List<Long> findFriends(@PathVariable Long id)  {
+        return userStorage.getFriends(id);
+    }
 
-//    @GetMapping("/users/{id}/friends/common/{otherId}")
-//    public List<Long> findGeneralFriends(@PathVariable Long id, @PathVariable Long otherId) {
-//        return userService.getGeneralFriends(id, otherId);
-//    }
+    @GetMapping("/users/{id}/friends/common/{otherId}")
+    public List<Long> findGeneralFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        return userService.getGeneralFriends(id, otherId);
+    }
 
 }

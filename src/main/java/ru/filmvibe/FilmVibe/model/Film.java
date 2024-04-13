@@ -3,6 +3,7 @@ package ru.filmvibe.FilmVibe.model;
 import java.time.LocalDate;
 import java.time.Duration;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.constraints.NotBlank;
@@ -13,7 +14,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -45,7 +45,6 @@ public class Film {
     private String mpa;
 
     private Long likes = 0L;
-    private List<Long> likedById = new ArrayList<>();
 
     public Film() {
         setId(nextId++);
@@ -69,7 +68,7 @@ public class Film {
     }
 
     public Film(Long id, String name, String description, LocalDate releaseDate, Duration duration,
-                String genre, String mpa) {
+                String genre, String mpa, Long likes) {
         setId(id);
         setName(name);
         setDescription(description);
@@ -77,6 +76,7 @@ public class Film {
         setDuration(duration);
         setGenre(genre);
         setMPA(mpa);
+        setLikes(likes);
     }
 
     public void setReleaseDate(LocalDate releaseDate) {
@@ -129,6 +129,7 @@ public class Film {
         return Objects.hash(name, description, releaseDate, duration);
     }
 
+    @JsonIgnore
     private final ArrayList<String> genres = new ArrayList<>(Arrays.asList(
             "Экшн",
             "Приключения",
@@ -152,6 +153,7 @@ public class Film {
             "Документальный"
     ));
 
+    @JsonIgnore
     private final ArrayList<String> mpaRatings = new ArrayList<>(Arrays.asList(
             "G",
             "PG",

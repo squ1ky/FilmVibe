@@ -43,10 +43,10 @@ public class FilmController {
         return filmStorage.addFilm(film);
     }
 
-    @PutMapping("/film")
-    public Film updateFilm(@Valid @RequestBody Film film) {
+    @PutMapping("/film/{id}")
+    public Film updateFilm(@RequestBody Film film, @PathVariable Long id) {
         log.info("PUT-request CREATE /post " + film.getName());
-        return filmStorage.updateFilm(film);
+        return filmStorage.updateFilm(film, id);
     }
 
     @GetMapping("/films")
@@ -77,9 +77,9 @@ public class FilmController {
         return "Лайк убран с фильма.";
     }
 
-//    @GetMapping("/films/popular")
-//    public List<Film> getTopByLikes(@RequestParam(required = false) Long count) {
-//        return filmService.getTopByLikes(count);
-//    }
+    @GetMapping("/films/popular")
+    public List<Film> getTopByLikes(@RequestParam(required = false) Long count) {
+        return filmService.getTopByLikes(count);
+    }
 
 }

@@ -18,8 +18,6 @@ public class UserService {
     @Autowired
     private final UserStorage userStorage;
 
-    final List<Long> generalFriends = new ArrayList<>();
-
     @Autowired
     public UserService(UserDbStorage userDbStorage) {
         userStorage = userDbStorage;
@@ -33,17 +31,20 @@ public class UserService {
         userStorage.deleteFriend(id, friendId);
     }
 
-//    public List<Long> getGeneralFriends(Long user1Id, Long user2Id) {
-//        User user1 = userStorage.getById(user1Id);
-//        User user2 = userStorage.getById(user2Id);
-//        for (Long friendId : user1.getFriends()) {
-//            if (user2.getFriends().contains(friendId)) {
-//                generalFriends.add(friendId);
-//            }
-//        }
-//
-//        return generalFriends;
-//    }
+    public List<Long> getGeneralFriends(Long user1Id, Long user2Id) {
+        List<Long> friendsOfUser1 = userStorage.getFriends(user1Id);
+        List<Long> friendsOfUser2 = userStorage.getFriends(user2Id);
+
+        List<Long> result = new ArrayList<>();
+
+        for (Long id : friendsOfUser1) {
+            if (friendsOfUser2.contains(id)) {
+                result.add(id);
+            }
+        }
+
+        return result;
+    }
 
     public User findUserById(Long id) {
         return userStorage.getById(id);
