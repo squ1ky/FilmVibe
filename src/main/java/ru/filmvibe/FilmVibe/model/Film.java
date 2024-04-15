@@ -118,15 +118,12 @@ public class Film {
 
         Film film = (Film) o;
         return Objects.equals(name, film.getName()) &&
-                Objects.equals(description, film.getDescription()) &&
-                Objects.equals(releaseDate, film.getReleaseDate()) &&
-                Objects.equals(duration, film.getDuration()) &&
-                Objects.equals(likes, film.getLikes());
+                Objects.equals(description, film.getDescription());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, releaseDate, duration);
+        return Objects.hash(name, description);
     }
 
     @JsonIgnore

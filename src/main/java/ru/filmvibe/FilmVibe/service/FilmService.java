@@ -1,24 +1,24 @@
 package ru.filmvibe.FilmVibe.service;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import ru.filmvibe.FilmVibe.exceptions.film.UserAlreadyLikedFilmException;
+import ru.filmvibe.FilmVibe.exceptions.film.UserNotLikedFilmException;
 import ru.filmvibe.FilmVibe.model.Film;
-import ru.filmvibe.FilmVibe.model.comparator.FilmComparator;
 import ru.filmvibe.FilmVibe.storage.film.FilmStorage;
 import ru.filmvibe.FilmVibe.storage.film.FilmDbStorage;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 
 @Service
 public class FilmService {
 
-    @Autowired
     private final FilmStorage filmStorage;
-
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -27,9 +27,9 @@ public class FilmService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void addLike(Long filmId, Long userId) {
+    public void addLike(Long filmId, Long userId) throws UserAlreadyLikedFilmException {
         if (getUsersIdLikedFilm(filmId).contains(userId)) {
-            //throw new UserAlreadyLikedThisFilmException("Пользователь уже лайкнул этот фильм.");
+            throw new UserAlreadyLikedFilmException(String.format(" (Film id = %s, User id = %s)", filmId, userId));
         } else {
             String sqlForFilmLikes =
                     """
@@ -49,26 +49,27 @@ public class FilmService {
         }
     }
 
-    public void deleteLike(Long filmId, Long userId) {
-        if (getUsersIdLikedFilm(filmId).contains(userId)) {
-            String sqlForFilmLikes =
-                    """
-                    UPDATE Film_Likes
-                    SET likes_quantity = likes_quantity - 1
-                    WHERE id = ?
-                    """;
+    public void deleteLike(Long filmId, Long userId) throws UserNotLikedFilmException {
 
-            String sqlForFilmLikedBy =
-                    """
-                    DELETE FROM Film_Liked_By
-                    WHERE (film_id = ? AND user_id = ?)
-                    """;
-
-            jdbcTemplate.update(sqlForFilmLikedBy, filmId, userId);
-            jdbcTemplate.update(sqlForFilmLikes, filmId);
-        } else {
-            // throw exception ...
+        if (!getUsersIdLikedFilm(filmId).contains(userId)) {
+            throw new UserNotLikedFilmException(String.format(" (Film id = %s, User id = %s)", filmId, userId));
         }
+
+        String sqlForFilmLikes =
+                """
+                UPDATE Film_Likes
+                SET likes_quantity = likes_quantity - 1
+                WHERE id = ?
+                """;
+
+        String sqlForFilmLikedBy =
+                """
+                DELETE FROM Film_Liked_By
+                WHERE (film_id = ? AND user_id = ?)
+                """;
+
+        jdbcTemplate.update(sqlForFilmLikedBy, filmId, userId);
+        jdbcTemplate.update(sqlForFilmLikes, filmId);
     }
 
     private List<Long> getUsersIdLikedFilm(Long id) {
@@ -83,53 +84,9 @@ public class FilmService {
     }
 
     public List<Film> getTopByLikes(Long count) {
-        String sql =
-                """
-                SELECT
-                Films.id as id,
-                name,
-                description,
-                genre,
-                mpa,
-                release_date,
-                duration,
-                likes_quantity,
-                FROM Film_Likes
-                JOIN Films ON Film_Likes.id = Films.id
-                JOIN Films_Info ON Film_Likes.id = Films_Info.id
-                ORDER BY likes_quantity DESC
-                LIMIT(?)
-                """;
-
-        return jdbcTemplate.query(sql, (rs, rowNum) -> filmStorage.makeFilm(rs) , count);
+        return filmStorage.allFilms().stream()
+                .sorted(Comparator.comparingLong(Film::getLikes).reversed())
+                .limit(count)
+                .collect(Collectors.toList());
     }
-
-
-//    public List<Film> getTopByLikes(Long count) {
-//        topByLikes.clear();
-//        List<Film> allFilms = filmStorage.allFilms();
-//
-//        if (count == null) {
-//            if (allFilms.size() > 10) {
-//                count = 10L;
-//            } else {
-//                count = (long) allFilms.size();
-//            }
-//        }
-//
-//        if (count < 0) {
-//            throw new IncorrectParameterException(count.toString());
-//        }
-//
-//        if (count > allFilms.size()) {
-//            throw new CountIsBiggerThanFilmsSizeException("count > allFilms.size()");
-//        }
-//
-//        allFilms.sort(new FilmComparator());
-//        for (int i = 0; i < count; i++) {
-//            topByLikes.add(allFilms.get(i));
-//        }
-//
-//        return topByLikes;
-// }
 }

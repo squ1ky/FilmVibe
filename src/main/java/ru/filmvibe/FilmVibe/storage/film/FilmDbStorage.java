@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import ru.filmvibe.FilmVibe.exceptions.film.FilmAlreadyExistsException;
-import ru.filmvibe.FilmVibe.exceptions.film.FilmNotFoundException;
+import ru.filmvibe.FilmVibe.exceptions.film.FilmIdNotFoundException;
 import ru.filmvibe.FilmVibe.model.Film;
 
 import java.sql.ResultSet;
@@ -21,7 +21,6 @@ import java.time.Duration;
 @Component
 public class FilmDbStorage implements FilmStorage {
 
-    @Autowired
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -32,7 +31,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film addFilm(Film film) throws FilmAlreadyExistsException {
 
-        if (ContainsFilm(film)) {
+        if (containsFilm(film)) {
             throw new FilmAlreadyExistsException(film.getName());
         }
 
@@ -64,7 +63,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getGenre(),
                 film.getMpa(),
                 film.getReleaseDate(),
-                ConvertDurationToSqlTime(film.getDuration())
+                convertDurationToSqlTime(film.getDuration())
         );
 
         jdbcTemplate.update(sqlForFilmLikes, 0);
@@ -73,8 +72,12 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film, Long id) {
+    public Film updateFilm(Film film, Long id) throws FilmIdNotFoundException {
         film.setId(id);
+
+        if (!containsFilmId(id)) {
+            throw new FilmIdNotFoundException(id.toString());
+        }
 
         String sqlForFilms =
                 """
@@ -100,7 +103,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getGenre(),
                 film.getMpa(),
                 film.getReleaseDate(),
-                ConvertDurationToSqlTime(film.getDuration()),
+                convertDurationToSqlTime(film.getDuration()),
                 id
         );
 
@@ -120,7 +123,23 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs));
     }
 
-    public Film getById(Long id) {
+    public List<Long> allFilmsId() {
+
+        String sql =
+                """
+                SELECT id
+                FROM Films
+                """;
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("id"));
+    }
+
+    public Film getById(Long id) throws FilmIdNotFoundException {
+
+        if (!allFilmsId().contains(id)) {
+            throw new FilmIdNotFoundException(id.toString());
+        }
+
         String sql =
                 """
                 SELECT Films.id, name, description, genre, mpa, release_date, duration, likes_quantity
@@ -134,39 +153,40 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public String deleteById(Long id) {
-        if (ContainsFilmId(id)) {
+    public String deleteById(Long id) throws FilmIdNotFoundException {
 
-            String sqlForFilmsInfo =
-                    """
-                    DELETE FROM Films_Info
-                    WHERE id = ?
-                    """;
-            String sqlForFilmLikedBy =
-                    """
-                    DELETE FROM Film_Liked_By
-                    WHERE film_id = ?
-                    """;
-            String sqlForFilmLikes =
-                    """
-                    DELETE FROM Film_Likes
-                    WHERE id = ?
-                    """;
-            String sqlForFilms =
-                    """
-                    DELETE FROM Films
-                    WHERE id = ?
-                    """;
-
-            jdbcTemplate.update(sqlForFilmsInfo, id);
-            jdbcTemplate.update(sqlForFilmLikedBy, id);
-            jdbcTemplate.update(sqlForFilmLikes, id);
-            jdbcTemplate.update(sqlForFilms, id);
-
-            return "Фильм удален!";
+        if (!containsFilmId(id)) {
+            throw new FilmIdNotFoundException(id.toString());
         }
 
-        return "Фильм не удален";
+        String sqlForFilmsInfo =
+                """
+                DELETE FROM Films_Info
+                WHERE id = ?
+                """;
+
+        String sqlForFilmLikedBy =
+                """
+                DELETE FROM Film_Liked_By
+                WHERE film_id = ?
+                """;
+        String sqlForFilmLikes =
+                """
+                DELETE FROM Film_Likes
+                WHERE id = ?
+                """;
+        String sqlForFilms =
+                """
+                DELETE FROM Films
+                WHERE id = ?
+                """;
+
+        jdbcTemplate.update(sqlForFilmsInfo, id);
+        jdbcTemplate.update(sqlForFilmLikedBy, id);
+        jdbcTemplate.update(sqlForFilmLikes, id);
+        jdbcTemplate.update(sqlForFilms, id);
+
+        return "Фильм удален!";
     }
 
     @Override
@@ -183,42 +203,16 @@ public class FilmDbStorage implements FilmStorage {
         return new Film(id, name, description, releaseDate, duration, genre, mpa, likes);
     }
 
-    private java.sql.Time ConvertDurationToSqlTime(Duration duration) {
+    private java.sql.Time convertDurationToSqlTime(Duration duration) {
         LocalTime durationLT = LocalTime.MIDNIGHT.plus(duration);
         return java.sql.Time.valueOf(durationLT);
     }
 
-    private boolean ContainsFilmId(Long id) {
-        String sql =
-                """
-                SELECT COUNT(*)
-                FROM Films
-                WHERE id = ?
-                """;
-
-        Long cnt = jdbcTemplate.queryForObject(sql, Long.class, id);
-
-        if (cnt == null || cnt == 0L) {
-            return false;
-        }
-
-        return true;
+    public boolean containsFilmId(Long id) {
+        return allFilmsId().contains(id);
     }
 
-    private boolean ContainsFilm(Film film) {
-        String sql =
-                """
-                SELECT COUNT(*)
-                FROM Films
-                WHERE (name = ? AND description = ?)
-                """;
-
-        Long cnt = jdbcTemplate.queryForObject(sql, Long.class, film.getName(), film.getDescription());
-
-        if (cnt == null || cnt == 0L) {
-            return false;
-        }
-
-        return true;
+    public boolean containsFilm(Film film) {
+        return allFilms().contains(film);
     }
 }
