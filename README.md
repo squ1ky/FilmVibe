@@ -1,1 +1,1 @@
-![Схема базы данных](https://ibb.co/25LQ5bh)
+![Схема базы данных](https://i.ibb.co/t3Nt3dK/Film-Vibe-2.png)
