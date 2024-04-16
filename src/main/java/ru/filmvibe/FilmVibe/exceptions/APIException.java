@@ -14,10 +14,4 @@ public class APIException {
     private final String message;
     private final Throwable throwable;
     private final ZonedDateTime timestamp = ZonedDateTime.now(ZoneId.of("Europe/Moscow"));
-
-    public APIException(HttpStatus httpStatus, Throwable e) {
-        this.httpStatus = httpStatus;
-        this.message = e.getMessage();
-        this.throwable = e;
-    }
 }

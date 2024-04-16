@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 //import ru.filmvibe.FilmVibe.exception.validation.user.UserNotFoundException;
+import ru.filmvibe.FilmVibe.exceptions.user.UserIdNotFoundException;
 import ru.filmvibe.FilmVibe.model.User;
 import ru.filmvibe.FilmVibe.storage.user.UserDbStorage;
 import ru.filmvibe.FilmVibe.storage.user.UserStorage;
@@ -31,7 +32,11 @@ public class UserService {
         userStorage.deleteFriend(id, friendId);
     }
 
-    public List<Long> getGeneralFriends(Long user1Id, Long user2Id) {
+    public List<Long> getGeneralFriends(Long user1Id, Long user2Id) throws UserIdNotFoundException {
+
+        if (!userStorage.containsUserId(user1Id)) throw new UserIdNotFoundException(user1Id.toString());
+        if (!userStorage.containsUserId(user2Id)) throw new UserIdNotFoundException(user2Id.toString());
+
         List<Long> friendsOfUser1 = userStorage.getFriends(user1Id);
         List<Long> friendsOfUser2 = userStorage.getFriends(user2Id);
 
@@ -48,6 +53,5 @@ public class UserService {
 
     public User findUserById(Long id) {
         return userStorage.getById(id);
-//        throw new UserNotFoundException(id.toString());
     }
 }

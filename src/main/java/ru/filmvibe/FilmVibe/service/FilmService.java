@@ -1,8 +1,10 @@
 package ru.filmvibe.FilmVibe.service;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import ru.filmvibe.FilmVibe.exceptions.film.FilmIdNotFoundException;
 import ru.filmvibe.FilmVibe.exceptions.film.UserAlreadyLikedFilmException;
 import ru.filmvibe.FilmVibe.exceptions.film.UserNotLikedFilmException;
+import ru.filmvibe.FilmVibe.exceptions.user.UserIdNotFoundException;
 import ru.filmvibe.FilmVibe.model.Film;
 import ru.filmvibe.FilmVibe.storage.film.FilmStorage;
 import ru.filmvibe.FilmVibe.storage.film.FilmDbStorage;
@@ -27,7 +29,17 @@ public class FilmService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void addLike(Long filmId, Long userId) throws UserAlreadyLikedFilmException {
+    public void addLike(Long filmId, Long userId) throws FilmIdNotFoundException,
+                                                         UserIdNotFoundException,
+                                                         UserAlreadyLikedFilmException {
+        if (!filmStorage.containsFilmId(filmId)) {
+            throw new FilmIdNotFoundException(filmId.toString());
+        }
+
+        if (!filmStorage.containsFilmId(userId)) {
+            throw new UserIdNotFoundException(userId.toString());
+        }
+
         if (getUsersIdLikedFilm(filmId).contains(userId)) {
             throw new UserAlreadyLikedFilmException(String.format(" (Film id = %s, User id = %s)", filmId, userId));
         } else {
@@ -49,7 +61,16 @@ public class FilmService {
         }
     }
 
-    public void deleteLike(Long filmId, Long userId) throws UserNotLikedFilmException {
+    public void deleteLike(Long filmId, Long userId) throws FilmIdNotFoundException,
+                                                            UserNotLikedFilmException {
+
+        if (!filmStorage.containsFilmId(filmId)) {
+            throw new FilmIdNotFoundException(filmId.toString());
+        }
+
+        if (!filmStorage.containsFilmId(userId)) {
+            throw new UserIdNotFoundException(userId.toString());
+        }
 
         if (!getUsersIdLikedFilm(filmId).contains(userId)) {
             throw new UserNotLikedFilmException(String.format(" (Film id = %s, User id = %s)", filmId, userId));

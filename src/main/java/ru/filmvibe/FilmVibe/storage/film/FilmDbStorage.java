@@ -73,11 +73,12 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film, Long id) throws FilmIdNotFoundException {
-        film.setId(id);
 
         if (!containsFilmId(id)) {
             throw new FilmIdNotFoundException(id.toString());
         }
+
+        film.setId(id);
 
         String sqlForFilms =
                 """
@@ -208,10 +209,12 @@ public class FilmDbStorage implements FilmStorage {
         return java.sql.Time.valueOf(durationLT);
     }
 
+    @Override
     public boolean containsFilmId(Long id) {
         return allFilmsId().contains(id);
     }
 
+    @Override
     public boolean containsFilm(Film film) {
         return allFilms().contains(film);
     }

@@ -1,6 +1,10 @@
 package ru.filmvibe.FilmVibe.storage.user;
 
 import org.springframework.transaction.annotation.Transactional;
+import ru.filmvibe.FilmVibe.exceptions.user.AlreadyFriendsException;
+import ru.filmvibe.FilmVibe.exceptions.user.NotFriendsException;
+import ru.filmvibe.FilmVibe.exceptions.user.UserAlreadyExistsException;
+import ru.filmvibe.FilmVibe.exceptions.user.UserIdNotFoundException;
 import ru.filmvibe.FilmVibe.model.User;
 
 import org.springframework.stereotype.Component;
@@ -24,7 +28,11 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User createUser(User user) {
+    public User createUser(User user) throws UserAlreadyExistsException {
+
+        if (containsUser(user)) {
+            throw new UserAlreadyExistsException(user.getEmail());
+        }
 
         String sql =
                 """
@@ -43,7 +51,12 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
+    public User updateUser(User user, Long id) throws UserIdNotFoundException {
+
+        throwNotFoundIfUserNotExists(id);
+
+        user.setId(id);
+
         String sql =
                 """
                 UPDATE Users
@@ -62,6 +75,30 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    // REWORK WITH DELETE LIKES FROM Film_Likes and liked_by
+    @Override
+    public String deleteUserById(Long id) {
+
+        throwNotFoundIfUserNotExists(id);
+
+        String sqlForUsers =
+                """
+                DELETE FROM Users CASCADE
+                WHERE id = ?
+                """;
+
+        String sqlForFriends =
+                """
+                DELETE FROM Friends
+                WHERE (user_id = ? OR friend_id = ?)
+                """;
+
+        jdbcTemplate.update(sqlForFriends, id, id);
+        jdbcTemplate.update(sqlForUsers, id);
+
+        return "Пользователь удален!";
+    }
+
     @Override
     public List<User> allUsers() {
         String sql = "SELECT * FROM Users";
@@ -69,8 +106,21 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs));
     }
 
+    public List<Long> allUsersId() {
+        String sql =
+                """
+                SELECT id
+                FROM Users
+                """;
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("id"));
+    }
+
     @Override
-    public User getById(Long id) {
+    public User getById(Long id) throws UserIdNotFoundException {
+
+        throwNotFoundIfUserNotExists(id);
+
         String sql =
                 """
                 SELECT * FROM Users
@@ -92,7 +142,14 @@ public class UserDbStorage implements UserStorage {
 
     @Transactional
     @Override
-    public void addFriend(Long userId, Long friendId) {
+    public void addFriend(Long userId, Long friendId) throws UserIdNotFoundException,
+                                                             AlreadyFriendsException {
+
+        throwNotFoundIfUsersNotExist(userId, friendId);
+
+        if (getFriends(userId).contains(friendId)) {
+            throw new AlreadyFriendsException("");
+        }
 
         String sqlForUpdateFriendStatus =
                 """
@@ -119,7 +176,15 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void deleteFriend(Long userId, Long friendId) {
+    public void deleteFriend(Long userId, Long friendId) throws UserIdNotFoundException,
+                                                                NotFriendsException {
+
+        throwNotFoundIfUsersNotExist(userId, friendId);
+
+        if (!getFriends(userId).contains(friendId)) {
+            throw new NotFriendsException("");
+        }
+
         String sql =
                 """
                 DELETE FROM Friends WHERE (user_id = ? AND friend_id = ?);
@@ -130,7 +195,10 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public List<Long> getFriends(Long id) {
+    public List<Long> getFriends(Long id) throws UserIdNotFoundException {
+
+        throwNotFoundIfUserNotExists(id);
+
         String sql =
                 """
                 SELECT friend_id
@@ -150,5 +218,30 @@ public class UserDbStorage implements UserStorage {
                 """;
 
         return jdbcTemplate.queryForObject(sql, Long.class, userId, friendId);
+    }
+
+    @Override
+    public boolean containsUserId(Long id) {
+        return allUsersId().contains(id);
+    }
+
+    @Override
+    public boolean containsUser(User user) {
+        return allUsers().contains(user);
+    }
+
+    private void throwNotFoundIfUserNotExists(Long id) throws UserIdNotFoundException {
+        if (!containsUserId(id)) throw new UserIdNotFoundException(id.toString());
+    }
+
+    private void throwNotFoundIfUsersNotExist(Long user1Id, Long user2Id) throws UserIdNotFoundException {
+
+        if (!containsUserId(user1Id)) {
+            throw new UserIdNotFoundException(user1Id.toString());
+        }
+
+        if (!containsUserId(user2Id)) {
+            throw new UserIdNotFoundException(user2Id.toString());
+        }
     }
 }

@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import ru.filmvibe.FilmVibe.exceptions.film.IncorrectFilmParameterException;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -79,35 +80,37 @@ public class Film {
         setLikes(likes);
     }
 
-    public void setReleaseDate(LocalDate releaseDate) {
+    public void setReleaseDate(LocalDate releaseDate) throws IncorrectFilmParameterException {
         if (releaseDate.isAfter(LocalDate.of(1895, 12, 28))) {
             this.releaseDate = releaseDate;
         } else {
-            this.releaseDate = LocalDate.of(2000, 1, 1);
+            throw new IncorrectFilmParameterException("Дата релиза фильма", releaseDate.toString());
         }
     }
 
-    public void setDuration(Duration duration) {
+    public void setDuration(Duration duration) throws IncorrectFilmParameterException {
         if (!duration.isNegative()) {
             this.duration = duration;
         } else {
-            this.duration = Duration.ofSeconds(0);
+            throw new IncorrectFilmParameterException("Длительность фильма", duration.toString());
         }
     }
 
-    public void setGenre(String genre) {
+    public void setGenre(String genre) throws IncorrectFilmParameterException {
+        genre = firstLetterToUpper(genre);
         if (genres.contains(genre)) {
             this.genre = genre;
         } else {
-            this.genre = null;
+            throw new IncorrectFilmParameterException("Жанр фильма", genre);
         }
     }
 
-    public void setMPA(String mpa) {
+    public void setMPA(String mpa) throws IncorrectFilmParameterException {
+        mpa = firstLetterToUpper(mpa);
         if (mpaRatings.contains(mpa)) {
             this.mpa = mpa;
         } else {
-            this.mpa = null;
+            throw new IncorrectFilmParameterException("MPA фильма", mpa);
         }
     }
     
@@ -158,4 +161,8 @@ public class Film {
             "R",
             "NC-17"
     ));
+
+    private String firstLetterToUpper(String s) {
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
 }

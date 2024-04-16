@@ -42,11 +42,17 @@ public class UserController {
         return userStorage.createUser(user);
     }
 
-    @PutMapping("/user")
-    public User updateUser(@Valid @RequestBody User user) {
+    @PutMapping("/user/{id}")
+    public User updateUser(@Valid @RequestBody User user, @PathVariable Long id) {
         log.info("PUT-request update /user " + user.getLogin());
-        return userStorage.updateUser(user);
+        return userStorage.updateUser(user, id);
     }
+
+//    @DeleteMapping("/user/{id}")
+//    public String deleteUser(@PathVariable Long id) {
+//        log.info("DELETE-request delete /user " + id);
+//        return userStorage.deleteUserById(id);
+//    }
 
     @GetMapping("/users")
     public List<User> allUsers() {
