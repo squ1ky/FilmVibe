@@ -1,19 +1,12 @@
 package ru.filmvibe.FilmVibe.controller;
 
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import jakarta.validation.Valid;
 
-//import ru.filmvibe.FilmVibe.exception.film.CountIsBiggerThanFilmsSizeException;
-//import ru.filmvibe.FilmVibe.exception.user.UserAlreadyLikedThisFilmException;
-//import ru.filmvibe.FilmVibe.exception.user.UserNotLikedThisFilmException;
-//import ru.filmvibe.FilmVibe.exception.validation.film.FilmAlreadyExistsException;
-//import ru.filmvibe.FilmVibe.exception.validation.film.FilmNotFoundException;
-//import ru.filmvibe.FilmVibe.exception.validation.film.IncorrectReleaseDate;
-//import ru.filmvibe.FilmVibe.exception.validation.film.NegativeFilmDuration;
 import ru.filmvibe.FilmVibe.model.Film;
 import ru.filmvibe.FilmVibe.service.FilmService;
 import ru.filmvibe.FilmVibe.storage.film.FilmDbStorage;
@@ -25,7 +18,6 @@ import java.util.List;
 @RestController
 @Slf4j
 public class FilmController {
-
     @Autowired
     private final FilmStorage filmStorage;
     @Autowired
@@ -81,5 +73,4 @@ public class FilmController {
     public List<Film> getTopByLikes(@RequestParam(required = false) Long count) {
         return filmService.getTopByLikes(count);
     }
-
 }

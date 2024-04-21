@@ -3,7 +3,6 @@ package ru.filmvibe.FilmVibe.service;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
-//import ru.filmvibe.FilmVibe.exception.validation.user.UserNotFoundException;
 import ru.filmvibe.FilmVibe.exceptions.user.UserIdNotFoundException;
 import ru.filmvibe.FilmVibe.model.User;
 import ru.filmvibe.FilmVibe.storage.user.UserDbStorage;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 
 @Service
 public class UserService {
-
     @Autowired
     private final UserStorage userStorage;
 

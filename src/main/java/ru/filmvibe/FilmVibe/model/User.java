@@ -9,41 +9,24 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-//import ru.filmvibe.FilmVibe.exception.validation.user.*;
+import ru.filmvibe.FilmVibe.exceptions.user.IncorrectBirthdayException;
 
 import java.util.Objects;
 
 
 @Data
 public class User {
-
     @Setter
     @Getter
-    private static Long nextId = 1L;
     private Long id;
 
     @Email
     private String email;
+
     @NotBlank
     private String login;
     private String name;
     private LocalDate birthday;
-
-    public User() {
-        this.id = null;
-        this.email = null;
-        this.login = null;
-        this.name = null;
-        this.birthday = null;
-    }
-
-    public User(String email, String login, String name, LocalDate birthday) {
-        setId(nextId++);
-        setEmail(email);
-        setLogin(login);
-        setName(name);
-        setBirthday(birthday);
-    }
 
     public User(Long id, String email, String login, String name, LocalDate birthday) {
         setId(id);
@@ -61,11 +44,11 @@ public class User {
         }
     }
 
-    public void setBirthday(LocalDate birthday) {
+    public void setBirthday(LocalDate birthday) throws IncorrectBirthdayException {
         if (birthday.isBefore(LocalDate.now())) {
             this.birthday = birthday;
         } else {
-//            throw new IncorrectBirthday();
+            throw new IncorrectBirthdayException(birthday.toString());
         }
     }
 
@@ -84,5 +67,4 @@ public class User {
     public int hashCode() {
         return Objects.hash(id, email, login, name);
     }
-
 }

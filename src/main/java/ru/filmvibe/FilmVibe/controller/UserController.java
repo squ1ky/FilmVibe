@@ -7,9 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import jakarta.validation.Valid;
 
-//import ru.filmvibe.FilmVibe.exception.validation.user.UserNotFoundException;
-//import ru.filmvibe.FilmVibe.exception.validation.user.IncorrectBirthday;
-//import ru.filmvibe.FilmVibe.exception.validation.user.UserAlreadyExistsException;
 import ru.filmvibe.FilmVibe.model.User;
 import ru.filmvibe.FilmVibe.storage.user.UserDbStorage;
 import ru.filmvibe.FilmVibe.storage.user.UserStorage;
@@ -17,18 +14,15 @@ import ru.filmvibe.FilmVibe.service.UserService;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.ArrayList;
 
 
 @RestController
 @Slf4j
 public class UserController {
-
     @Autowired
     private final UserStorage userStorage;
     @Autowired
     final private UserService userService;
-
 
     @Autowired
     public UserController(UserDbStorage userDbStorage, UserService userService) {
@@ -48,11 +42,11 @@ public class UserController {
         return userStorage.updateUser(user, id);
     }
 
-//    @DeleteMapping("/user/{id}")
-//    public String deleteUser(@PathVariable Long id) {
-//        log.info("DELETE-request delete /user " + id);
-//        return userStorage.deleteUserById(id);
-//    }
+    @DeleteMapping("/user/{id}")
+    public String deleteUser(@PathVariable Long id) {
+        log.info("DELETE-request delete /user " + id);
+        return userStorage.deleteUserById(id);
+    }
 
     @GetMapping("/users")
     public List<User> allUsers() {
@@ -86,5 +80,4 @@ public class UserController {
     public List<Long> findGeneralFriends(@PathVariable Long id, @PathVariable Long otherId) {
         return userService.getGeneralFriends(id, otherId);
     }
-
 }

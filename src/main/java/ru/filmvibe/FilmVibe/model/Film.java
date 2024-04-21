@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.Duration;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.constraints.NotBlank;
@@ -12,6 +13,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+
 import ru.filmvibe.FilmVibe.exceptions.film.IncorrectFilmParameterException;
 
 import java.util.Arrays;
@@ -22,14 +24,9 @@ import java.util.Objects;
 @Data
 @Validated
 public class Film {
-
     @Getter
     @Setter
-    private Long id = nextId;
-
-    @Getter
-    @Setter
-    private static Long nextId = 1L;
+    private Long id = 1L;
 
     @NotBlank
     @Size(max = 100)
@@ -42,31 +39,10 @@ public class Film {
 
     @Size(max = 64)
     private String genre;
+
     @Size(max = 10)
     private String mpa;
-
     private Long likes = 0L;
-
-    public Film() {
-        setId(nextId++);
-        this.name = null;
-        this.description = null;
-        this.releaseDate = null;
-        this.duration = null;
-        this.genre = null;
-        this.mpa = null;
-    }
-
-    public Film(String name, String description, LocalDate releaseDate, Duration duration,
-                String genre, String mpa) {
-        setId(nextId++);
-        setName(name);
-        setDescription(description);
-        setReleaseDate(releaseDate);
-        setDuration(duration);
-        setGenre(genre);
-        setMPA(mpa);
-    }
 
     public Film(Long id, String name, String description, LocalDate releaseDate, Duration duration,
                 String genre, String mpa, Long likes) {

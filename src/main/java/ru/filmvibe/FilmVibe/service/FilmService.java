@@ -1,6 +1,5 @@
 package ru.filmvibe.FilmVibe.service;
 
-import org.springframework.jdbc.core.JdbcTemplate;
 import ru.filmvibe.FilmVibe.exceptions.film.FilmIdNotFoundException;
 import ru.filmvibe.FilmVibe.exceptions.film.UserAlreadyLikedFilmException;
 import ru.filmvibe.FilmVibe.exceptions.film.UserNotLikedFilmException;
@@ -8,7 +7,9 @@ import ru.filmvibe.FilmVibe.exceptions.user.UserIdNotFoundException;
 import ru.filmvibe.FilmVibe.model.Film;
 import ru.filmvibe.FilmVibe.storage.film.FilmStorage;
 import ru.filmvibe.FilmVibe.storage.film.FilmDbStorage;
+import ru.filmvibe.FilmVibe.storage.user.UserStorage;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,13 +20,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
-
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmService(FilmDbStorage filmDbStorage, JdbcTemplate jdbcTemplate) {
-        filmStorage = filmDbStorage;
+    public FilmService(FilmDbStorage filmDbStorage, UserStorage userStorage, JdbcTemplate jdbcTemplate) {
+        this.filmStorage = filmDbStorage;
+        this.userStorage = userStorage;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -36,7 +38,7 @@ public class FilmService {
             throw new FilmIdNotFoundException(filmId.toString());
         }
 
-        if (!filmStorage.containsFilmId(userId)) {
+        if (!userStorage.containsUserId(userId)) {
             throw new UserIdNotFoundException(userId.toString());
         }
 
@@ -68,7 +70,7 @@ public class FilmService {
             throw new FilmIdNotFoundException(filmId.toString());
         }
 
-        if (!filmStorage.containsFilmId(userId)) {
+        if (!userStorage.containsUserId(userId)) {
             throw new UserIdNotFoundException(userId.toString());
         }
 

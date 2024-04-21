@@ -11,16 +11,15 @@ import ru.filmvibe.FilmVibe.model.Film;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.time.LocalTime;
 import java.util.List;
 
+import java.time.LocalTime;
 import java.time.LocalDate;
 import java.time.Duration;
 
 
 @Component
 public class FilmDbStorage implements FilmStorage {
-
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -50,14 +49,13 @@ public class FilmDbStorage implements FilmStorage {
         String sqlForFilmLikes =
                 """
                 INSERT INTO Film_Likes (likes_quantity)
-                VALUES (?)
+                VALUES (0)
                 """;
 
         jdbcTemplate.update(sqlForFilms,
                 film.getName(),
                 film.getDescription()
         );
-
 
         jdbcTemplate.update(sqlForFilmsInfo,
                 film.getGenre(),
@@ -66,7 +64,7 @@ public class FilmDbStorage implements FilmStorage {
                 convertDurationToSqlTime(film.getDuration())
         );
 
-        jdbcTemplate.update(sqlForFilmLikes, 0);
+        jdbcTemplate.update(sqlForFilmLikes);
 
         return film;
     }
@@ -125,7 +123,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public List<Long> allFilmsId() {
-
         String sql =
                 """
                 SELECT id
@@ -171,11 +168,13 @@ public class FilmDbStorage implements FilmStorage {
                 DELETE FROM Film_Liked_By
                 WHERE film_id = ?
                 """;
+
         String sqlForFilmLikes =
                 """
                 DELETE FROM Film_Likes
                 WHERE id = ?
                 """;
+
         String sqlForFilms =
                 """
                 DELETE FROM Films
@@ -190,7 +189,6 @@ public class FilmDbStorage implements FilmStorage {
         return "Фильм удален!";
     }
 
-    @Override
     public Film makeFilm(ResultSet rs) throws SQLException {
         Long id = rs.getLong("id");
         String name = rs.getString("name");

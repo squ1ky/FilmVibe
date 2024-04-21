@@ -6,10 +6,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import ru.filmvibe.FilmVibe.exceptions.film.*;
-import ru.filmvibe.FilmVibe.exceptions.user.AlreadyFriendsException;
-import ru.filmvibe.FilmVibe.exceptions.user.NotFriendsException;
-import ru.filmvibe.FilmVibe.exceptions.user.UserAlreadyExistsException;
-import ru.filmvibe.FilmVibe.exceptions.user.UserIdNotFoundException;
+import ru.filmvibe.FilmVibe.exceptions.user.*;
+
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -47,8 +45,6 @@ public class ErrorHandler {
         return new ResponseEntity<>(new APIException(CONFLICT, message + e.getMessage(), e), CONFLICT);
     }
 
-    // USER SECTION
-
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<Object> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
         String message = String.format("Пользователь с почтой %s уже существует.", e.getMessage());
@@ -71,5 +67,11 @@ public class ErrorHandler {
     public ResponseEntity<Object> handleNotFriendsException(NotFriendsException e) {
         String message = "Пользователи не друзья.";
         return new ResponseEntity<>(new APIException(CONFLICT, message, e), CONFLICT);
+    }
+
+    @ExceptionHandler(IncorrectBirthdayException.class)
+    public ResponseEntity<Object> handleIncorrectBirthdayException(IncorrectBirthdayException e) {
+        String message = "Вы еще не родились :)";
+        return new ResponseEntity<>(new APIException(BAD_REQUEST, message, e), BAD_REQUEST);
     }
 }

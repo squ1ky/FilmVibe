@@ -1,12 +1,12 @@
 package ru.filmvibe.FilmVibe.storage.user;
 
-import org.springframework.transaction.annotation.Transactional;
 import ru.filmvibe.FilmVibe.exceptions.user.AlreadyFriendsException;
 import ru.filmvibe.FilmVibe.exceptions.user.NotFriendsException;
 import ru.filmvibe.FilmVibe.exceptions.user.UserAlreadyExistsException;
 import ru.filmvibe.FilmVibe.exceptions.user.UserIdNotFoundException;
 import ru.filmvibe.FilmVibe.model.User;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Component;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -20,7 +20,6 @@ import java.util.List;
 
 @Component
 public class UserDbStorage implements UserStorage {
-
     private final JdbcTemplate jdbcTemplate;
 
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
@@ -75,11 +74,23 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
-    // REWORK WITH DELETE LIKES FROM Film_Likes and liked_by
     @Override
     public String deleteUserById(Long id) {
 
         throwNotFoundIfUserNotExists(id);
+
+        String sqlForFilmLikedBy =
+                """
+                DELETE FROM Film_Liked_By CASCADE
+                WHERE user_id = ?
+                """;
+
+        String sqlForFilmLikes =
+                """
+                UPDATE Film_Likes
+                SET likes_quantity = likes_quantity - 1
+                WHERE id = ?
+                """;
 
         String sqlForUsers =
                 """
@@ -93,6 +104,11 @@ public class UserDbStorage implements UserStorage {
                 WHERE (user_id = ? OR friend_id = ?)
                 """;
 
+        for (Long filmId : getLikedFilms(id)) {
+            jdbcTemplate.update(sqlForFilmLikes, filmId);
+        }
+
+        jdbcTemplate.update(sqlForFilmLikedBy, id);
         jdbcTemplate.update(sqlForFriends, id, id);
         jdbcTemplate.update(sqlForUsers, id);
 
@@ -243,5 +259,16 @@ public class UserDbStorage implements UserStorage {
         if (!containsUserId(user2Id)) {
             throw new UserIdNotFoundException(user2Id.toString());
         }
+    }
+
+    private List<Long> getLikedFilms(Long id) {
+        String sql =
+                """
+                SELECT film_id
+                FROM Film_Liked_By
+                WHERE user_id = ?
+                """;
+
+        return jdbcTemplate.queryForList(sql, Long.class, id);
     }
 }
