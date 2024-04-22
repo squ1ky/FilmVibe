@@ -48,8 +48,8 @@ public class FilmDbStorage implements FilmStorage {
 
         String sqlForFilmLikes =
                 """
-                INSERT INTO Film_Likes (likes_quantity)
-                VALUES (0)
+                INSERT INTO Film_Likes (id, likes_quantity)
+                VALUES (?, 0)
                 """;
 
         jdbcTemplate.update(sqlForFilms,
@@ -64,7 +64,9 @@ public class FilmDbStorage implements FilmStorage {
                 convertDurationToSqlTime(film.getDuration())
         );
 
-        jdbcTemplate.update(sqlForFilmLikes);
+        Long id = getIdByName(film.getName());
+
+        jdbcTemplate.update(sqlForFilmLikes, id);
 
         return film;
     }
@@ -148,6 +150,17 @@ public class FilmDbStorage implements FilmStorage {
                 """;
 
         return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> makeFilm(rs), id);
+    }
+
+    private Long getIdByName(String name) {
+        String sql =
+                """
+                SELECT id
+                FROM Films
+                WHERE name = ?
+                """;
+
+        return jdbcTemplate.queryForObject(sql, Long.class, name);
     }
 
     @Override
